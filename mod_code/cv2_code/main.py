@@ -16,9 +16,8 @@ class window_det():
         screenshot = self.wincap.get_screenshot()
         grey = cv.cvtColor(screenshot,cv.COLOR_BGR2GRAY)
         ret,thresh = cv.threshold(grey,220,255,cv.THRESH_BINARY_INV)
-
-        contours,_ = cv.findContours(thresh,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE )
         
+        contours,_ = cv.findContours(thresh,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
         
         for c in contours:
             x, y, w, h = cv.boundingRect(c)
