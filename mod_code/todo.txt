@@ -1,0 +1,35 @@
+
+
+        ## TODO: Make a separate class for motor control which can be accessed by any files, like they can import the joint and then control it
+        ## TODO: Check if we can get only the collide (boolean) without the pygame window, and then return it in real time to the claw
+        ## TODO: Make the code so that it can later be compatible with what the rest of the CLAW software works like, it should fit like a glove when you are finished
+        ## TODO: For the frames we can train it to 1.move towards the object, 2.Catch the object
+        ## TODO: It should be able to 1. Take images from AWS and run it,2. Return the motor control predictions to the actual motor 
+        ## since they already have a tried and tested code in place to run the motor, so it should fit in with that, the predictions should also work
+        ## TODO: Not  a joke, be serious its an actual company with actual product and professional software
+        ## TODO: this environment will return a reward to the RL model(from cv2_code bounding box overlap)
+            
+
+
+
+key most commonly used:
+
+d,left
+a, right
+s, down
+w, up
+
+u
+h
+j
+k
+
+w
+a
+s
+d
+
+up 
+down 
+left 
+right
