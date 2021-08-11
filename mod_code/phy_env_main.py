@@ -192,7 +192,7 @@ class Simulator(object):
         if(tuple1[1]>=585 or tuple1[1]<=15):
              self.object_1.velocity = Vec2d(self.object_1.velocity.x,-self.object_1.velocity.y)
 
-    
+
     def reset(self):
         for body in self.space.bodies:
             body.position = body.start_position
@@ -266,9 +266,9 @@ class Simulator(object):
             self.passed = [round(target_angles[0]-cur_angles[0]),round(target_angles[1]-cur_angles[1]),round(target_angles[2]-cur_angles[2]),round(target_angles[3]-cur_angles[3])]
     
     def step_rl(self,action):
-
-        ## array of actions: [forward, back, rotate left,rotate right, 8 numbers for arm control] so total 12 dimensional action space
+        ## actions: [x thruster (forward and backward upto -40 to 40), y thruster (forward and backward(-40 to 40)), 4 angle control values like (+1,-1,-1,+1)]
         ## this will also return the next state after action, reward for the action taken and done(boolean)
+        # state will be : Current angle values, current thruster values, 
          for event in pygame.event.get():
                 if event.type == QUIT or (event.type == KEYDOWN and event.key in (K_q, K_ESCAPE)):
                     sys.exit(0)
