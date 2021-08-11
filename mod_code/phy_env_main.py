@@ -365,3 +365,6 @@ if __name__ == '__main__':
         sim.render() ## thi
         win.ret_reward()
 
+
+        ## 40 to -40 for thrusters and 100 to 200 for angles
+
