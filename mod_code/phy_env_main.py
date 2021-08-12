@@ -239,13 +239,11 @@ class Simulator(object):
         print("local point velocity vector:"+str(self.chassis_b.velocity_at_local_point([0,0])))
     
     def change_angle(self,angles):
-            
             self.chassis_angle = self.chassis_b.angle*180/np.pi
-            self.lr_angle = round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle)
-            self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle)
-            self.lf_angle = round(self.leftLeg_1b_body.angle*180/np.pi- self.chassis_angle-self.lr_angle)
-            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.chassis_angle-self.rr_angle)
-
+            self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
+            self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
+            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-360))
+            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle+360)
             cur_angles = [self.lf_angle,self.lr_angle,self.rr_angle,self.rf_angle]
             target_angles = self.target
             if (abs(target_angles[0]-cur_angles[0])<delta) and (abs(target_angles[1]-cur_angles[1])<delta) and (abs(target_angles[2]-cur_angles[2])<delta) and (abs(target_angles[3]-cur_angles[3])<delta):
