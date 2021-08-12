@@ -67,7 +67,7 @@ class Simulator(object):
         self.shape_box  = pymunk.Circle(self.object_1,10)
         self.shape_box.color = (0,0,128,0)            
         #---chassis
-        self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)))
+        self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)),body_type=pymunk.Body.STATIC)
         self.chassis_b.position = chassisXY
         chassis_shape = pymunk.Poly.create_box(self.chassis_b, (chWd, chHt))
         chassis_shape.color = (200, 200, 200,0)
@@ -145,7 +145,15 @@ class Simulator(object):
         self.motor_ac1Right.max_force = 1000000
         self.motor_ba1Left.max_force = 1000000
         self.motor_ba1Right.max_force = 1000000
-         
+
+        
+        # self.chassis_angle = self.chassis_b.angle*180/np.pi
+
+        # self.lf_angle = round(self.leftLeg_1b_body.angle*180/np.pi- self.chassis_angle)
+        # self.lr_angle = round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle)
+        # self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle)
+        # self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.chassis_angle)
+
         handler = self.space.add_default_collision_handler()
         handler.begin = self.coll_begin
         handler.pre_solve = self.coll_pre
@@ -175,12 +183,17 @@ class Simulator(object):
                 for x in range(iterations): # 10 iterations to get a more stable simulation
                     self.space.step(dt)
             #########
+        self.return_angle_state()
         pygame.display.flip()
         self.clock.tick(fps)
     
     def return_angle_state(self):
-        chassis_angle = self.chassis_b.angle*180/np.pi
-        print(str(round(self.leftLeg_1b_body.angle*180/np.pi- chassis_angle))+" "+str(round(self.leftLeg_1a_body.angle*180/np.pi-chassis_angle))+" "+str(round(self.rightLeg_1a_body.angle*180/np.pi-chassis_angle))+" "+str(round(self.rightLeg_1b_body.angle*180/np.pi-chassis_angle)))
+            self.chassis_angle = self.chassis_b.angle*180/np.pi
+            self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
+            self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
+            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-360))
+            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle+360)
+            print(str(self.lf_angle)+" "+str(self.lr_angle)+" "+str(self.rr_angle)+" "+str(self.rf_angle))
         ## state consists of angles, forward velocity of claw, angular velocity of claw, position of target object, caught object or not, net reward
         ## now gives constant angle
     
@@ -218,6 +231,7 @@ class Simulator(object):
 
 
 
+
     def printinfo(self):
         #print("Angle:"+str(self.chassis_b.angle))
         #print("COG:"+str(self.chassis_b.center_of_gravity))
@@ -225,9 +239,14 @@ class Simulator(object):
         print("local point velocity vector:"+str(self.chassis_b.velocity_at_local_point([0,0])))
     
     def change_angle(self,angles):
+            
+            self.chassis_angle = self.chassis_b.angle*180/np.pi
+            self.lr_angle = round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle)
+            self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle)
+            self.lf_angle = round(self.leftLeg_1b_body.angle*180/np.pi- self.chassis_angle-self.lr_angle)
+            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.chassis_angle-self.rr_angle)
 
-            chassis_angle = self.chassis_b.angle*180/np.pi
-            cur_angles = [self.leftLeg_1b_body.angle*180/np.pi- chassis_angle,self.leftLeg_1a_body.angle*180/np.pi-chassis_angle,self.rightLeg_1a_body.angle*180/np.pi-chassis_angle,self.rightLeg_1b_body.angle*180/np.pi-chassis_angle]
+            cur_angles = [self.lf_angle,self.lr_angle,self.rr_angle,self.rf_angle]
             target_angles = self.target
             if (abs(target_angles[0]-cur_angles[0])<delta) and (abs(target_angles[1]-cur_angles[1])<delta) and (abs(target_angles[2]-cur_angles[2])<delta) and (abs(target_angles[3]-cur_angles[3])<delta):
                 self.motor_ac1Left.rate = 0
@@ -363,7 +382,7 @@ if __name__ == '__main__':
     while(True):
         sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
         sim.render() ## thi
-        win.ret_reward()
+        # win.ret_reward()
 
 
         ## 40 to -40 for thrusters and 100 to 200 for angles
