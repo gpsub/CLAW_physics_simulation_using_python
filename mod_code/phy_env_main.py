@@ -32,8 +32,6 @@ class Simulator(object):
         right.friction = 0.2
         top = pymunk.Segment(self.space.static_body, (0,-5), (600,-5), 1.0)
         top.friction = 0.2
-        
-
         ground.elasticity = 1.0
         left.elasticity = 1.0
         top.elasticity = 1.0
@@ -53,7 +51,7 @@ class Simulator(object):
         font = pygame.font.Font(None, 16)
         # Create the spider
         chassisXY = Vec2d(self.display_size[0]/2,300)
-        chWd = 100; chHt = 5
+        chWd = 120; chHt = 5
         chassisMass = 40
 
         legWd_a = 100; legHt_a = 5
@@ -171,7 +169,7 @@ class Simulator(object):
 ## ***************************************-------------------------------------------------------------------------------------**********
 ## down , we have all the useful functions for this environment
 
-    
+
     def render(self):
         self.screen.fill((255,255,255))
         self.space.debug_draw(self.draw_options)### Draw space        
@@ -183,7 +181,7 @@ class Simulator(object):
                 for x in range(iterations): # 10 iterations to get a more stable simulation
                     self.space.step(dt)
             #########
-        self.return_angle_state()
+        # self.return_angle_state()
         pygame.display.flip()
         self.clock.tick(fps)
     
@@ -228,9 +226,6 @@ class Simulator(object):
     def coll_separate(self,arbiter,space,data):
         # print("separate")
         pass
-
-
-
 
     def printinfo(self):
         #print("Angle:"+str(self.chassis_b.angle))
@@ -284,6 +279,7 @@ class Simulator(object):
     
     def step_rl(self,action):
         ## actions: [x thruster (forward and backward upto -40 to 40), y thruster (forward and backward(-40 to 40)), 4 angle control values like (+1,-1,-1,+1)]
+        ## thruster will also be controlled
         ## this will also return the next state after action, reward for the action taken and done(boolean)
         # state will be : Current angle values, current thruster values, 
          for event in pygame.event.get():
@@ -293,7 +289,6 @@ class Simulator(object):
                     # Start/stop simulation
                     simulate = not simulate
                 elif event.type == KEYDOWN and event.key == K_r:
-                    # Reset.
                     self.reset()
                 elif event.type == KEYDOWN and event.key == K_h:
                     self.chassis_b.angular_velocity = -2
@@ -380,7 +375,8 @@ if __name__ == '__main__':
     while(True):
         sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
         sim.render() ## thi
-        # win.ret_reward()
+        reward = win.ret_reward()
+        print("reward is "+str(reward))
 
 
         ## 40 to -40 for thrusters and 100 to 200 for angles
