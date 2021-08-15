@@ -53,7 +53,7 @@ class Simulator(object):
         chassisXY = Vec2d(self.display_size[0]/2,300)
         chWd = 120; chHt = 5
         chassisMass = 40
-
+        self.reward=0
         legWd_a = 100; legHt_a = 5
         legWd_b = 100; legHt_b = 5 
         legMass = 5
@@ -65,7 +65,7 @@ class Simulator(object):
         self.shape_box  = pymunk.Circle(self.object_1,10)
         self.shape_box.color = (0,0,128,0)            
         #---chassis
-        self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)),body_type=pymunk.Body.STATIC)
+        self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)))
         self.chassis_b.position = chassisXY
         chassis_shape = pymunk.Poly.create_box(self.chassis_b, (chWd, chHt))
         chassis_shape.color = (200, 200, 200,0)
@@ -157,14 +157,16 @@ class Simulator(object):
         handler.pre_solve = self.coll_pre
         handler.post_solve = self.coll_post
         handler.separate = self.coll_separate
-        self.target = [120,60,-60,-120]    
         # class, with method :move joints 
         # one object for each joint , params: angle to achieve/ dircetion fro increment with resolution for
         # increment  
         
+        self.target = [100,130,130,100]
         self.passed = self.target ## initially same, then passed decreases to 0
         ## passed value should be decreasing, target should be constant, passed value should be target value minus current value
         self.simulate = True
+        self.x_thrust=0
+        self.y_thrust=0
 
 ## ***************************************-------------------------------------------------------------------------------------**********
 ## down , we have all the useful functions for this environment
@@ -181,7 +183,9 @@ class Simulator(object):
                 for x in range(iterations): # 10 iterations to get a more stable simulation
                     self.space.step(dt)
             #########
-        # self.return_angle_state()
+        self.return_angle_state()
+        self.check_collide()
+        self.change_angle(self.passed)
         pygame.display.flip()
         self.clock.tick(fps)
     
@@ -189,8 +193,8 @@ class Simulator(object):
             self.chassis_angle = self.chassis_b.angle*180/np.pi
             self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
             self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
-            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-360))
-            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle+360)
+            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-self.chassis_angle-360))
+            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle-self.chassis_angle+360)
             print(str(self.lf_angle)+" "+str(self.lr_angle)+" "+str(self.rr_angle)+" "+str(self.rf_angle))
         ## state consists of angles, forward velocity of claw, angular velocity of claw, position of target object, caught object or not, net reward
         ## now gives constant angle
@@ -212,6 +216,7 @@ class Simulator(object):
             body.velocity = 0, 0
             body.angular_velocity = 0
             body.angle = body.start_angle
+        self.reward = 0
             
     def coll_begin(self,arbiter,space,data):
             print("collided")
@@ -237,8 +242,8 @@ class Simulator(object):
             self.chassis_angle = self.chassis_b.angle*180/np.pi
             self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
             self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
-            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-360))
-            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle+360)
+            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-self.chassis_angle-360))
+            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle-self.chassis_angle+360)
             cur_angles = [self.lf_angle,self.lr_angle,self.rr_angle,self.rf_angle]
             target_angles = self.target
             if (abs(target_angles[0]-cur_angles[0])<delta) and (abs(target_angles[1]-cur_angles[1])<delta) and (abs(target_angles[2]-cur_angles[2])<delta) and (abs(target_angles[3]-cur_angles[3])<delta):
@@ -250,16 +255,16 @@ class Simulator(object):
             if abs(target_angles[0]-cur_angles[0])<delta:
                    self.motor_ba1Left.rate = 0
             elif target_angles[0]-cur_angles[0]>delta:
-                    self.motor_ba1Left.rate = 1
-            elif target_angles[0]-cur_angles[0]<delta:
                     self.motor_ba1Left.rate = -1
+            elif target_angles[0]-cur_angles[0]<delta:
+                    self.motor_ba1Left.rate = 1
         
             if abs(target_angles[1]-cur_angles[1])<delta:
                    self.motor_ac1Left.rate = 0
             elif target_angles[1]-cur_angles[1]>delta:
-                    self.motor_ac1Left.rate = 1
-            elif target_angles[1]-cur_angles[1]<delta:
                     self.motor_ac1Left.rate = -1
+            elif target_angles[1]-cur_angles[1]<delta:
+                    self.motor_ac1Left.rate = 1
             
             if abs(target_angles[2]-cur_angles[2])<delta:
                    self.motor_ac1Right.rate = 0
@@ -282,45 +287,10 @@ class Simulator(object):
         ## thruster will also be controlled
         ## this will also return the next state after action, reward for the action taken and done(boolean)
         # state will be : Current angle values, current thruster values, 
-         for event in pygame.event.get():
-                if event.type == QUIT or (event.type == KEYDOWN and event.key in (K_q, K_ESCAPE)):
-                    sys.exit(0)
-                elif event.type == KEYDOWN and event.key == K_z:
-                    # Start/stop simulation
-                    simulate = not simulate
-                elif event.type == KEYDOWN and event.key == K_r:
-                    self.reset()
-                elif event.type == KEYDOWN and event.key == K_h:
-                    self.chassis_b.angular_velocity = -2
-                elif event.type == KEYDOWN and event.key == K_u:
-                    self.chassis_b.apply_force_at_local_point([0,-1500000])
-                elif event.type == KEYDOWN and event.key == K_j:
-                    self.chassis_b.apply_force_at_local_point([0,1500000])
-                elif event.type == KEYDOWN and event.key == K_k:
-                    self.chassis_b.angular_velocity = 2
-                elif event.type == KEYDOWN and event.key == K_w:
-                    self.motor_ba1Left.rate = -rotationRate
-                elif event.type == KEYDOWN and event.key == K_s:
-                    self.motor_ba1Left.rate = rotationRate
-                elif event.type == KEYDOWN and event.key == K_a:
-                    self.motor_ac1Left.rate = -rotationRate
-                elif event.type == KEYDOWN and event.key == K_d:
-                    self.motor_ac1Left.rate = rotationRate
-                elif event.type == KEYDOWN and event.key ==K_UP:
-                    self.motor_ba1Right.rate = rotationRate
-                elif event.type == KEYDOWN and event.key ==K_DOWN:
-                    self.motor_ba1Right.rate = -rotationRate
-                elif event.type == KEYDOWN and event.key ==K_LEFT:
-                    self.motor_ac1Right.rate = -rotationRate
-                elif event.type == KEYDOWN and event.key ==K_RIGHT:
-                    self.motor_ac1Right.rate = rotationRate
-                elif event.type == KEYUP:
-                    print("keyup")
-                    self.motor_ba1Left.rate = 0
-                    self.motor_ac1Left.rate = 0
-                    self.motor_ba1Right.rate = 0 
-                    self.motor_ac1Right.rate = 0
-                    self.chassis_b.angular_velocity = 0
+        ## -40 to 40 for thruster(forward, backward, rotate let and rotate right) for small value it should rotate little and for large value it should rotate more
+        #  and 100-200 for angles
+        #action = [1,1,+1,-1,-1,+1] # first value will control the forward backward, second value will control the left and right, 3-6 values will control the angles
+        pass
 
     def step_manual(self):
        ####This step function is for manual control (if this specific file is run then it will give keyboard control)
@@ -375,8 +345,8 @@ if __name__ == '__main__':
     while(True):
         sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
         sim.render() ## thi
-        reward = win.ret_reward()
-        print("reward is "+str(reward))
+        # # sim.reward += win.ret_reward()
+        # print("reward is "+str(sim.reward))
 
 
         ## 40 to -40 for thrusters and 100 to 200 for angles
