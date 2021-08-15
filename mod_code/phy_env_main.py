@@ -290,7 +290,38 @@ class Simulator(object):
         ## -40 to 40 for thruster(forward, backward, rotate let and rotate right) for small value it should rotate little and for large value it should rotate more
         #  and 100-200 for angles
         #action = [1,1,+1,-1,-1,+1] # first value will control the forward backward, second value will control the left and right, 3-6 values will control the angles
-        pass
+        if (action[0]==1) and (self.x_thrust<40):
+            self.x_thrust +=1
+        if(action[0]==-1) and (self.x_thrust>(-40)):
+            self.x_thrust -=1
+        if (action[1]==1) and (self.y_thrust<40):
+            self.y_thrust +=1
+        if(action[1]==-1) and (self.y_thrust>(-40)):
+            self.y_thrust -=1
+        if(action[2]==1) and (self.lf_angle<200):
+            self.target[0] +=1
+        if(action[2]==-1) and (self.lf_angle>100):
+            self.target[0] -=1
+        if(action[3]==1) and (self.lr_angle<200):
+            self.target[1] +=1
+        if(action[3]==-1) and (self.lr_angle>100):
+            self.target[1] -=1
+        if(action[4]==1) and (self.rr_angle<200):
+            self.target[2] +=1
+        if(action[4]==-1) and (self.rr_angle>100):
+            self.target[2] -=1
+        if(action[5]==1) and (self.rf_angle<200):
+            self.target[3] +=1
+        if(action[5]==-1) and (self.rf_angle>100):
+            self.target[3] -=1
+        
+
+        ## applying the forward backward and rotation angles
+        self.chassis_b.apply_force_at_local_point([0,-1500000/40*self.x_thrust])
+        self.chassis_b.angular_velocity = 4/40*self.y_thrust
+        return self.reward,
+
+        
 
     def step_manual(self):
        ####This step function is for manual control (if this specific file is run then it will give keyboard control)
@@ -306,9 +337,9 @@ class Simulator(object):
                 elif event.type == KEYDOWN and event.key == K_h:
                     self.chassis_b.angular_velocity = -2
                 elif event.type == KEYDOWN and event.key == K_u:
-                    self.chassis_b.apply_force_at_local_point([0,-1500000])
+                    self.chassis_b.apply_force_at_local_point([0,-1500000/40*self.x_thrust])
                 elif event.type == KEYDOWN and event.key == K_j:
-                    self.chassis_b.apply_force_at_local_point([0,1500000])
+                    self.chassis_b.apply_force_at_local_point([0,1500000/40*self.x_thrust])
                 elif event.type == KEYDOWN and event.key == K_k:
                     self.chassis_b.angular_velocity = 2
                 elif event.type == KEYDOWN and event.key == K_w:
