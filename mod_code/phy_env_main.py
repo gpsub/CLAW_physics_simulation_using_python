@@ -182,7 +182,6 @@ class Simulator(object):
         if self.simulate:
                 for x in range(iterations): # 10 iterations to get a more stable simulation
                     self.space.step(dt)
-            #########
         self.return_angle_state()
         self.check_collide()
         self.change_angle(self.passed)
@@ -319,7 +318,10 @@ class Simulator(object):
         ## applying the forward backward and rotation angles
         self.chassis_b.apply_force_at_local_point([0,-1500000/40*self.x_thrust])
         self.chassis_b.angular_velocity = 4/40*self.y_thrust
-        return self.reward,
+        # state will consist of current 4 angle values, position of object,position of claw,distance to object,velocity of claw, angular velocity of claw,current thruster value(x and y)
+        new_state = [self.lf_angle,self.lr_angle,self.rr_angle,self.rf_angle,self.chassis_b.position,self.object_1.position,self.chassis_b.velocity,self.chassis_b.angular_velocity]
+        done = False
+        return new_state,self.reward,done
 
         
 
@@ -337,9 +339,9 @@ class Simulator(object):
                 elif event.type == KEYDOWN and event.key == K_h:
                     self.chassis_b.angular_velocity = -2
                 elif event.type == KEYDOWN and event.key == K_u:
-                    self.chassis_b.apply_force_at_local_point([0,-1500000/40*self.x_thrust])
+                    self.chassis_b.apply_force_at_local_point([0,-1500000])
                 elif event.type == KEYDOWN and event.key == K_j:
-                    self.chassis_b.apply_force_at_local_point([0,1500000/40*self.x_thrust])
+                    self.chassis_b.apply_force_at_local_point([0,1500000])
                 elif event.type == KEYDOWN and event.key == K_k:
                     self.chassis_b.angular_velocity = 2
                 elif event.type == KEYDOWN and event.key == K_w:
@@ -376,7 +378,7 @@ if __name__ == '__main__':
     while(True):
         sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
         sim.render() ## thi
-        # # sim.reward += win.ret_reward()
+        #  sim.reward += win.ret_reward()
         # print("reward is "+str(sim.reward))
 
 
