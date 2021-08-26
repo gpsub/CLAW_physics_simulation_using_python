@@ -16,7 +16,7 @@ print(reward)
 ##**********phy_env file
 ## TODO: need a render method(phy_env.py)env.render() DONE
 ## TODO: already have env.reset(phy_env.py) DONE
-## TODO: need env.step([action]) function(phy_env.py), env.step returns new state,reward and done
+## TODO: need env.step([action]) function(phy_env.py), env.step returns new state,reward and done DON
 
 
 
@@ -26,6 +26,11 @@ print(reward)
 ## TODO: will make a class of DQN which has the functions for replay buffer, etc etc
 ## TODO: need a store transition(state,reward,action taken, next state) function 
 ## TODO: if memory full then learn
+
+
+
+
+
 
 ## will call both rl files and activate simulation here itself. Will test out different models and see which works
 # best.

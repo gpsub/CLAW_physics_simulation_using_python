@@ -378,7 +378,7 @@ if __name__ == '__main__':
     while(True):
         sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
         sim.render() ## thi
-        #  sim.reward += win.ret_reward()
+        sim.reward += win.ret_reward()
         # print("reward is "+str(sim.reward))
 
 
