@@ -16,7 +16,7 @@ print(reward)
 ##**********phy_env file
 ## TODO: need a render method(phy_env.py)env.render() DONE
 ## TODO: already have env.reset(phy_env.py) DONE
-## TODO: need env.step([action]) function(phy_env.py), env.step returns new state,reward and done DON
+## TODO: need env.step([action]) function(phy_env.py), env.step returns new state,reward and done DONE
 
 
 
