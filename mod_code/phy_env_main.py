@@ -49,7 +49,7 @@ class Simulator(object):
         # Delete above line to show the purple colour joints, I chose to remove it to make opencv detection more simple
         self.clock = pygame.time.Clock()
         font = pygame.font.Font(None, 16)
-        # Create the spider
+        # Set the initial coordinates and the weights/inertias for all the bodies
         chassisXY = Vec2d(self.display_size[0]/2,300)
         chWd = 120; chHt = 5
         chassisMass = 40
@@ -58,13 +58,14 @@ class Simulator(object):
         legWd_b = 100; legHt_b = 5 
         legMass = 5
         relativeAnguVel = 0
-       ## Object definition         
+       ### DEFINITION of  arms of the claw
+       ## Trash object definition(the blue circle which is the target)
         self.object_1 =pymunk.Body(2,pymunk.moment_for_circle(5,0,10))
         self.object_1.friction = 2
         self.object_1.position = Vec2d(210, 210)
         self.shape_box  = pymunk.Circle(self.object_1,10)
         self.shape_box.color = (0,0,128,0)            
-        #---chassis
+        # Middle shoulder join definition
         self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)))
         self.chassis_b.position = chassisXY
         chassis_shape = pymunk.Poly.create_box(self.chassis_b, (chWd, chHt))
@@ -72,7 +73,7 @@ class Simulator(object):
         self.chassis_b.start_position = chassisXY
         self.chassis_b.start_angle = 0
         print("chassis position");print(self.chassis_b.position)
-        #---first left leg a
+        #-- Definition of left rarearm (adjacent connected  to the middle arm)
         self.leftLeg_1a_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_a, legHt_a)))
         self.leftLeg_1a_body.position = chassisXY - ((chWd/2)+(legWd_a/2), 0)
         self.leftLeg_1a_body.start_position = self.chassis_b.start_position - ((chWd/2)+(legWd_a/2), 0)
@@ -80,7 +81,7 @@ class Simulator(object):
         self.leftLeg_1a_shape = pymunk.Poly.create_box(self.leftLeg_1a_body, (legWd_a, legHt_a))        
         self.leftLeg_1a_shape.color = (255, 0, 0,0)
 
-        #---first left leg b
+        #---Definition of the left forearm(adjacent connected to the left rarearm)
         self.leftLeg_1b_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_b, legHt_b)))
         self.leftLeg_1b_body.position = self.leftLeg_1a_body.position - ((legWd_a/2)+(legWd_b/2), 0)
         self.leftLeg_1b_body.start_position = self.leftLeg_1a_body.start_position - ((legWd_a/2)+(legWd_b/2), 0)
@@ -88,7 +89,7 @@ class Simulator(object):
         self.leftLeg_1b_shape = pymunk.Poly.create_box(self.leftLeg_1b_body, (legWd_b, legHt_b))        
         self.leftLeg_1b_shape.color = (0, 255, 0,0)        
 
-        #---first right leg a
+        #---Definition of the right rarearm(adjacent connected to the right of the middle shoulder body)
         self.rightLeg_1a_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_a, legHt_a)))
         self.rightLeg_1a_body.position = chassisXY + ((chWd/2)+(legWd_a/2), 0)
         self.rightLeg_1a_body.start_position = self.chassis_b.start_position + ((chWd/2)+(legWd_a/2), 0)
@@ -96,7 +97,7 @@ class Simulator(object):
         self.rightLeg_1a_shape = pymunk.Poly.create_box(self.rightLeg_1a_body, (legWd_a, legHt_a))        
         self.rightLeg_1a_shape.color = (255, 0, 0,0)        
 
-        #---first right leg b
+        #---Definition of the right forearm (adjacent connected to the right of the right rarearm)
         self.rightLeg_1b_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_b, legHt_b)))
         self.rightLeg_1b_body.position = self.rightLeg_1a_body.position + ((legWd_a/2)+(legWd_b/2), 0)
         self.rightLeg_1b_body.start_position = self.rightLeg_1a_body.start_position + ((legWd_a/2)+(legWd_b/2), 0)
@@ -107,24 +108,26 @@ class Simulator(object):
         self.object_1.start_position = Vec2d(210,210)
         self.object_1.start_angle = 0
 
-        #---link left leg b with left leg a       
+        #---joint link between left rarearm and forearm    
         pj_ba1left = pymunk.PinJoint(self.leftLeg_1b_body, self.leftLeg_1a_body, (legWd_b/2,0), (-legWd_a/2,0))#anchor point coordinates are wrt the body; not the space
         self.motor_ba1Left = pymunk.SimpleMotor(self.leftLeg_1b_body, self.leftLeg_1a_body, relativeAnguVel)
         self.motor_ba1Left.collide_bodies = False
         
-        #---link left leg a with chassis
+        # joint link betwwen left rarearm and middle chassis body
         pj_ac1left = pymunk.PinJoint(self.leftLeg_1a_body, self.chassis_b, (legWd_a/2,0), (-chWd/2, 0))
         self.motor_ac1Left = pymunk.SimpleMotor(self.leftLeg_1a_body, self.chassis_b, relativeAnguVel)
         self.motor_ac1Left.collide_bodies = False
         
-        #---link right leg b with right leg a       
+        # joint link between the right forearm and right rarearm
         pj_ba1Right = pymunk.PinJoint(self.rightLeg_1b_body, self.rightLeg_1a_body, (-legWd_b/2,0), (legWd_a/2,0))#anchor point coordinates are wrt the body; not the space
         self.motor_ba1Right = pymunk.SimpleMotor(self.rightLeg_1b_body, self.rightLeg_1a_body, relativeAnguVel)
         self.motor_ba1Right.collide_bodies = False
-        #---link right leg a with chassis
+        # joint link between the right rare arm and the middle chassis body
         pj_ac1Right = pymunk.PinJoint(self.rightLeg_1a_body, self.chassis_b, (-legWd_a/2,0), (chWd/2, 0 ))
         self.motor_ac1Right = pymunk.SimpleMotor(self.rightLeg_1a_body, self.chassis_b, relativeAnguVel)      
         self.motor_ac1Right.collide_bodies = False
+
+        ## Adding all the bodies to the defined pymunk space, this will display it on the window
 
         self.space.add(self.chassis_b, chassis_shape) 
         self.space.add(self.leftLeg_1a_body, self.leftLeg_1a_shape, self.rightLeg_1a_body, self.rightLeg_1a_shape) 
@@ -144,23 +147,16 @@ class Simulator(object):
         self.motor_ba1Left.max_force = 1000000
         self.motor_ba1Right.max_force = 1000000
 
-        
-        # self.chassis_angle = self.chassis_b.angle*180/np.pi
-
-        # self.lf_angle = round(self.leftLeg_1b_body.angle*180/np.pi- self.chassis_angle)
-        # self.lr_angle = round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle)
-        # self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle)
-        # self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.chassis_angle)
-
+    
+        ## adding a collision handler so that we can modify what happens when target object/ claw arms collide with
+        # each other (if required)
         handler = self.space.add_default_collision_handler()
         handler.begin = self.coll_begin
         handler.pre_solve = self.coll_pre
         handler.post_solve = self.coll_post
         handler.separate = self.coll_separate
-        # class, with method :move joints 
-        # one object for each joint , params: angle to achieve/ dircetion fro increment with resolution for
-        # increment  
-        
+       
+       ## variables to control the movement of the claw 
         self.target = [100,130,130,100]
         self.passed = self.target ## initially same, then passed decreases to 0
         ## passed value should be decreasing, target should be constant, passed value should be target value minus current value
@@ -173,6 +169,8 @@ class Simulator(object):
 
 
     def render(self):
+        ## this function is called after every frame refresh,shows the changes in the position/ orientation of all objects
+        ## refreshes the entire screen
         self.screen.fill((255,255,255))
         self.space.debug_draw(self.draw_options)### Draw space        
         pygame.display.flip()
@@ -189,6 +187,8 @@ class Simulator(object):
         self.clock.tick(fps)
     
     def return_angle_state(self):
+        ## this function is basically to note what angle values are currently there in the claw arms
+        ## it doesnt have any utility, just for development purposes
             self.chassis_angle = self.chassis_b.angle*180/np.pi
             self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
             self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
@@ -200,6 +200,7 @@ class Simulator(object):
     
             
     def check_collide(self):
+        ## this function is made so that the target object(trash) can bounce off the walls when it hits them
         tuple1 = self.object_1.position.int_tuple
         if(tuple1[0]>=585 or tuple1[0]<=15):
              self.object_1.velocity = Vec2d(-self.object_1.velocity.x,self.object_1.velocity.y)
@@ -208,6 +209,7 @@ class Simulator(object):
 
 
     def reset(self):
+        ## this is used to reset all the bodies and objects to the initial state
         for body in self.space.bodies:
             body.position = body.start_position
             body.force = 0, 0
@@ -216,7 +218,8 @@ class Simulator(object):
             body.angular_velocity = 0
             body.angle = body.start_angle
         self.reward = 0
-            
+    ## the next four functions are for collision handlers, they dont do anything for now,but we can use them in the future
+    # if required
     def coll_begin(self,arbiter,space,data):
             print("collided")
             self.reward -= 1
@@ -232,12 +235,15 @@ class Simulator(object):
         pass
 
     def printinfo(self):
+        ## this function can be used if we want to know the velocity and direction information from the claw(in the python environment)
         #print("Angle:"+str(self.chassis_b.angle))
         #print("COG:"+str(self.chassis_b.center_of_gravity))
         #print("rotation vector:"+str(self.chassis_b.rotation_vector))
         print("local point velocity vector:"+str(self.chassis_b.velocity_at_local_point([0,0])))
     
     def change_angle(self,angles):
+            ## this function is used to set the motor rate so that it can move to the desired target angle, (whether by increasing)
+            # or decreasing
             self.chassis_angle = self.chassis_b.angle*180/np.pi
             self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
             self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
@@ -282,6 +288,8 @@ class Simulator(object):
             self.passed = [round(target_angles[0]-cur_angles[0]),round(target_angles[1]-cur_angles[1]),round(target_angles[2]-cur_angles[2]),round(target_angles[3]-cur_angles[3])]
     
     def step_rl(self,action):
+        ## this function will be used for the deep learning algorithm, it will make the changes in the environment, get the reward, 
+        # and return the next state to the RL model file
         ## actions: [x thruster (forward and backward upto -40 to 40), y thruster (forward and backward(-40 to 40)), 4 angle control values like (+1,-1,-1,+1)]
         ## thruster will also be controlled
         ## this will also return the next state after action, reward for the action taken and done(boolean)
@@ -375,9 +383,11 @@ class Simulator(object):
 if __name__ == '__main__':
     sim = Simulator()
     win = window_det()
+    ## here, we make an object of the simulator class and object detection class(from mod_code/cv2_code) 
+    ## run it in an infinite loop, to exit we can use Q key or escape key, to reset we use r key.
     while(True):
         sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
-        sim.render() ## thi
+        sim.render() 
         sim.reward += win.ret_reward()
         # print("reward is "+str(sim.reward))
 
