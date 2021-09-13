@@ -273,14 +273,14 @@ class Simulator(object):
             
             if abs(target_angles[2]-cur_angles[2])<delta:
                    self.motor_ac1Right.rate = 0
-            if target_angles[2]-cur_angles[2]>delta:
+            elif target_angles[2]-cur_angles[2]>delta:
                     self.motor_ac1Right.rate = 1
             elif target_angles[2]-cur_angles[2]<delta:
                     self.motor_ac1Right.rate = -1
             
             if abs(target_angles[3]-cur_angles[3])<delta:
                    self.motor_ba1Right.rate = 0
-            if target_angles[3]-cur_angles[3]>delta:
+            elif target_angles[3]-cur_angles[3]>delta:
                     self.motor_ba1Right.rate = 1
             elif target_angles[3]-cur_angles[3]<delta:
                     self.motor_ba1Right.rate = -1
