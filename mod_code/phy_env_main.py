@@ -45,7 +45,7 @@ class Simulator(object):
        ## bg_img = pygame.image.load('mod_code\water_bg.png').convert()
         #self.screen.blit(bg_img,[0,0])
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
-        self.draw_options.flags = pymunk.SpaceDebugDrawOptions.DRAW_SHAPES | pymunk.SpaceDebugDrawOptions.DRAW_COLLISION_POINTS
+        # self.draw_options.flags = pymunk.SpaceDebugDrawOptions.DRAW_SHAPES | pymunk.SpaceDebugDrawOptions.DRAW_COLLISION_POINTS
         # Delete above line to show the purple colour joints, I chose to remove it to make opencv detection more simple
         self.clock = pygame.time.Clock()
         font = pygame.font.Font(None, 16)
@@ -66,7 +66,7 @@ class Simulator(object):
         self.shape_box  = pymunk.Circle(self.object_1,10)
         self.shape_box.color = (0,0,128,0)            
         # Middle shoulder join definition
-        self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)))
+        self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)),pymunk.Body.STATIC)
         self.chassis_b.position = chassisXY
         chassis_shape = pymunk.Poly.create_box(self.chassis_b, (chWd, chHt))
         chassis_shape.color = (200, 200, 200,0)
@@ -109,21 +109,21 @@ class Simulator(object):
         self.object_1.start_angle = 0
 
         #---joint link between left rarearm and forearm    
-        pj_ba1left = pymunk.PinJoint(self.leftLeg_1b_body, self.leftLeg_1a_body, (legWd_b/2,0), (-legWd_a/2,0))#anchor point coordinates are wrt the body; not the space
+        self.pj_ba1left = pymunk.PinJoint(self.leftLeg_1b_body, self.leftLeg_1a_body, (legWd_b/2,0), (-legWd_a/2,0))#anchor point coordinates are wrt the body; not the space
         self.motor_ba1Left = pymunk.SimpleMotor(self.leftLeg_1b_body, self.leftLeg_1a_body, relativeAnguVel)
         self.motor_ba1Left.collide_bodies = False
         
         # joint link betwwen left rarearm and middle chassis body
-        pj_ac1left = pymunk.PinJoint(self.leftLeg_1a_body, self.chassis_b, (legWd_a/2,0), (-chWd/2, 0))
+        self.pj_ac1left = pymunk.PinJoint(self.leftLeg_1a_body, self.chassis_b, (legWd_a/2,0), (-chWd/2, 0))
         self.motor_ac1Left = pymunk.SimpleMotor(self.leftLeg_1a_body, self.chassis_b, relativeAnguVel)
         self.motor_ac1Left.collide_bodies = False
         
         # joint link between the right forearm and right rarearm
-        pj_ba1Right = pymunk.PinJoint(self.rightLeg_1b_body, self.rightLeg_1a_body, (-legWd_b/2,0), (legWd_a/2,0))#anchor point coordinates are wrt the body; not the space
+        self.pj_ba1Right = pymunk.PinJoint(self.rightLeg_1b_body, self.rightLeg_1a_body, (-legWd_b/2,0), (legWd_a/2,0))#anchor point coordinates are wrt the body; not the space
         self.motor_ba1Right = pymunk.SimpleMotor(self.rightLeg_1b_body, self.rightLeg_1a_body, relativeAnguVel)
         self.motor_ba1Right.collide_bodies = False
         # joint link between the right rare arm and the middle chassis body
-        pj_ac1Right = pymunk.PinJoint(self.rightLeg_1a_body, self.chassis_b, (-legWd_a/2,0), (chWd/2, 0 ))
+        self.pj_ac1Right = pymunk.PinJoint(self.rightLeg_1a_body, self.chassis_b, (-legWd_a/2,0), (chWd/2, 0 ))
         self.motor_ac1Right = pymunk.SimpleMotor(self.rightLeg_1a_body, self.chassis_b, relativeAnguVel)      
         self.motor_ac1Right.collide_bodies = False
 
@@ -132,10 +132,9 @@ class Simulator(object):
         self.space.add(self.chassis_b, chassis_shape) 
         self.space.add(self.leftLeg_1a_body, self.leftLeg_1a_shape, self.rightLeg_1a_body, self.rightLeg_1a_shape) 
         self.space.add(self.leftLeg_1b_body, self.leftLeg_1b_shape, self.rightLeg_1b_body, self.rightLeg_1b_shape) 
-        self.space.add(pj_ba1left, self.motor_ba1Left, pj_ac1left, self.motor_ac1Left)  
-        self.space.add(pj_ba1Right, self.motor_ba1Right, pj_ac1Right, self.motor_ac1Right)      
-        self.space.add(self.object_1,self.shape_box)
-#        ---prevent collisions with ShapeFilter
+        self.space.add(self.pj_ba1left, self.motor_ba1Left, self.pj_ac1left, self.motor_ac1Left)  
+        self.space.add(self.pj_ba1Right, self.motor_ba1Right, self.pj_ac1Right, self.motor_ac1Right)      
+        # self.space.add(self.object_1,self.shape_box) ## Uncomment to add moving ball---prevent collisions with ShapeFilter
         self.leftLeg_1a_shape.filter = pymunk.ShapeFilter(group=1)
         self.rightLeg_1a_shape.filter = pymunk.ShapeFilter(group=2)
         self.leftLeg_1b_shape.filter = pymunk.ShapeFilter(group=1)
@@ -147,14 +146,14 @@ class Simulator(object):
         self.motor_ba1Left.max_force = 1000000
         self.motor_ba1Right.max_force = 1000000
 
-    
+        self.collided = 0
         ## adding a collision handler so that we can modify what happens when target object/ claw arms collide with
         # each other (if required)
-        handler = self.space.add_default_collision_handler()
-        handler.begin = self.coll_begin
-        handler.pre_solve = self.coll_pre
-        handler.post_solve = self.coll_post
-        handler.separate = self.coll_separate
+        self.handler = self.space.add_default_collision_handler()
+        self.handler.begin = self.coll_begin
+        self.handler.pre_solve = self.coll_pre
+        self.handler.post_solve = self.coll_post
+        self.handler.separate = self.coll_separate
        
        ## variables to control the movement of the claw 
         self.target = [100,130,130,100]
@@ -180,9 +179,10 @@ class Simulator(object):
         if self.simulate:
                 for x in range(iterations): # 10 iterations to get a more stable simulation
                     self.space.step(dt)
-        self.return_angle_state()
+        # self.return_angle_state()
         self.check_collide()
-        self.change_angle(self.passed)
+        # self.change_angle(self.passed)
+        self.getjointpositions()
         pygame.display.flip()
         self.clock.tick(fps)
     
@@ -219,20 +219,35 @@ class Simulator(object):
             body.angle = body.start_angle
         self.reward = 0
     ## the next four functions are for collision handlers, they dont do anything for now,but we can use them in the future
-    # if required
+
     def coll_begin(self,arbiter,space,data):
-            print("collided")
-            self.reward -= 1
+           
             return True
     def coll_pre(self,arbiter,space,data):
-        #print("presolve")
+        self.collided = 1
         return True
     def coll_post(self,arbiter,space,data):
         pass
         #print("post solve")
     def coll_separate(self,arbiter,space,data):
-        # print("separate")
+        self.collided=0
         pass
+    def getjointpositions(self):
+        body_center = Vec2d(0,0)
+        body_left_joint = Vec2d(-60,-2)
+        body_right_joint =Vec2d(60,-2)
+        body_bc_leftjoint= Vec2d(-50,-2)
+        body_ac_leftjoint = Vec2d(-50,-2)
+        body_bc_rightjoint = Vec2d(50,-2)
+        left1 = self.leftLeg_1a_body.local_to_world(body_bc_leftjoint.int_tuple).int_tuple
+        left2 = self.leftLeg_1b_body.local_to_world(body_bc_leftjoint.int_tuple).int_tuple
+        right1 = self.rightLeg_1a_body.local_to_world(body_bc_rightjoint.int_tuple).int_tuple
+        right2 = self.rightLeg_1b_body.local_to_world(body_bc_rightjoint.int_tuple).int_tuple
+
+        
+        
+
+        print("Left2:"+str(left2)+" left1: "+str(left1)+" right1:"+str(right1)+" right2:"+str(right2)+" #"+str(self.collided));
 
     def printinfo(self):
         ## this function can be used if we want to know the velocity and direction information from the claw(in the python environment)
@@ -388,9 +403,4 @@ if __name__ == '__main__':
     while(True):
         sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
         sim.render() 
-        sim.reward += win.ret_reward()
-        # print("reward is "+str(sim.reward))
-
-
-        ## 40 to -40 for thrusters and 100 to 200 for angles
-
+        # sim.reward += win.ret_reward()
