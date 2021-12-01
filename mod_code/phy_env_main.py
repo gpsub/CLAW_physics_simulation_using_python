@@ -232,6 +232,7 @@ class Simulator(object):
     def coll_separate(self,arbiter,space,data):
         self.collided=0
         pass
+   
     def getjointpositions(self):
         body_center = Vec2d(0,0)
         body_left_joint = Vec2d(-60,-2)
@@ -244,10 +245,7 @@ class Simulator(object):
         right1 = self.rightLeg_1a_body.local_to_world(body_bc_rightjoint.int_tuple).int_tuple
         right2 = self.rightLeg_1b_body.local_to_world(body_bc_rightjoint.int_tuple).int_tuple
 
-        
-        
-
-        print("Left2:"+str(left2)+" left1: "+str(left1)+" right1:"+str(right1)+" right2:"+str(right2)+" #"+str(self.collided));
+        print("Pixel coordinates for joints: Left2:"+str(left2)+" left1: "+str(left1)+" right1:"+str(right1)+" right2:"+str(right2)+" #"+str(self.collided))
 
     def printinfo(self):
         ## this function can be used if we want to know the velocity and direction information from the claw(in the python environment)
