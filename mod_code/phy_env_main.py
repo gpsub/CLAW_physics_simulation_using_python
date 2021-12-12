@@ -1,4 +1,4 @@
-from mod_code.cv2_code.main import window_det
+# from mod_code.cv2_code.main import window_det
 import sys
 import pygame
 from pygame.locals import USEREVENT, QUIT, KEYDOWN, KEYUP,K_e,K_s, K_r, K_q,K_w,K_a,K_s,K_d,K_k,K_u,K_j,K_h,K_j,K_z,K_ESCAPE, K_UP, K_DOWN, K_RIGHT, K_LEFT,K_2,K_4,K_6,K_8
@@ -395,10 +395,9 @@ class Simulator(object):
 
 if __name__ == '__main__':
     sim = Simulator()
-    win = window_det()
-    ## here, we make an object of the simulator class and object detection class(from mod_code/cv2_code) 
+    # here, we make an object of the simulator class and object detection class(from mod_code/cv2_code) 
     ## run it in an infinite loop, to exit we can use Q key or escape key, to reset we use r key.
     while(True):
-        sim.step_manual() ## should be taking in an array of actions and returning current state, action, reward, and next s
-        sim.render() 
-        # sim.reward += win.ret_reward()
+        sim.step_manual() ## (to control the robot)should be taking in an array of actions and returning current state, action, reward, and next s
+        sim.render() ## (to display the changes)
+      
