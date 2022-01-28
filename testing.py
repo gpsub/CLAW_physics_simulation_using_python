@@ -4,9 +4,8 @@ from PIL import Image
 from keras import models
 import os
 import tensorflow as tf
-
-model = models.load_model('weights/')
-video = cv.VideoCapture(0)
+model = models.load_model('weights/')   
+video = cv.VideoCapture(1)
 
 while True: 
     _,frame = video.read()

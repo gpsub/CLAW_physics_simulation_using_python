@@ -6,7 +6,9 @@
 # Node artifact files
 node_modules/
 dist/
-
+Capstone/
+ultralytics/
+fixNvPe.py
 # Compiled Java class files
 *.class
 Include/
@@ -14,7 +16,8 @@ Lib/
 .vscode/
 Scripts/
 pyvenv.cfg
-
+detectron2/
+train_data/
 # Compiled Python bytecode
 *.py[cod]
 .vscode/
