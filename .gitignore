@@ -18,6 +18,7 @@ Scripts/
 pyvenv.cfg
 detectron2/
 train_data/
+yolov5/
 # Compiled Python bytecode
 *.py[cod]
 .vscode/

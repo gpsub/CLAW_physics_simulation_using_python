@@ -14,7 +14,7 @@ class window_det():
         self.wincap = WindowCapture('CLAW_Arm')
         self.loop_time = tm() # for fps
         self.reward = 0
-        self.count=264
+        self.count=394
     def iou(self,rect1,rect2):
         x = 0
         ((x1,y1),(w1,h1),(a1)) = rect1
@@ -66,8 +66,8 @@ class window_det():
         # print('FPS {}'.format(1 / (time() - self.loop_time)))
         # self.loop_time = time()
         self.count+=1
-
-        if not cv.imwrite('./mod_code/Train/{}.jpg'.format(self.count),screenshot):
+        # please enter the filepath as per your computer starting from C:/Users/Username... etc inside os.path.join, it will be different as per your pc.
+        if not cv.imwrite(os.path.join(os.path.expanduser('~'),'jp_notebook','robotarm1','mod_code','Train','{}.jpg'.format(self.count)),screenshot):
             raise Exception("Not saved")
    
 
@@ -84,3 +84,4 @@ if __name__ == '__main__':
     while(True):
         win.ret_reward()
         time.sleep(0.7)
+    

@@ -156,7 +156,7 @@ class Simulator(object):
         self.handler.separate = self.coll_separate
        
        ## variables to control the movement of the claw 
-        self.target = [100,130,130,100]
+        self.target = [100,180,180,100]
         self.passed = self.target ## initially same, then passed decreases to 0
         ## passed value should be decreasing, target should be constant, passed value should be target value minus current value
         self.simulate = True
@@ -391,6 +391,7 @@ if __name__ == '__main__':
     sim = Simulator()
     # here, we make an object of the simulator class and object detection class(from mod_code/cv2_code) 
     ## run it in an infinite loop, to exit we can use Q key or escape key, to reset we use r key.
+    angle=[100,100,100,100]
     while(True):
         sim.step_manual() ## (to control the robot)should be taking in an array of actions and returning current state, action, reward, and next s
         sim.render() ## (to display the changes)
