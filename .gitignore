@@ -35,6 +35,45 @@ dist/
 
 # JetBrains IDE
 .idea/
+.ipynb_checkpoints/Seg_images-checkpoint.ipynb
+.ipynb_checkpoints/Segmentationpathplanning-checkpoint.ipynb
+COCO_Image_Viewer.ipynb
+deeplabv3_xception65_ade20k.h5
+mask_rcnn_model2.h5
+Pathoutput.png
+posedetection.py
+Seg_images.ipynb
+seg_images1.zip
+seglabels.txt
+segmentationcam.py
+Segmentationpathplanning.ipynb
+testval.json
+vis.py
+trainval.json
+.ipynb_checkpoints/
+weights/
+yolov5/
+yolov5_weights/
+AquaVision_RetinaNET.ipynb
+labels.txt
+model.py
+Udacity-CarND-Behavioral-Cloning/
+mmpose/
+mask_rcnn_models/
+labelme2coco1/
+Indoor-segmentation/
+human-pose-estimation-opencv/
+CarND-Behavioral-Cloning/
+car_simulator/
+images/
+seg_images/
+segment_output/
+
+
+
+saved_model.h5
+testing.py
+wincap.py
 
 # Unit test reports
 TEST*.xml
@@ -9865,28 +9904,3 @@ car_simulator/beta_simulator_windows/beta_simulator_Data/Mono/etc/mono/2.0/Brows
 car_simulator/beta_simulator_windows/beta_simulator_Data/Mono/etc/mono/mconfig/config.xml
 car_simulator/beta_simulator_windows/beta_simulator_Data/Resources/unity default resources
 car_simulator/beta_simulator_windows/beta_simulator_Data/Resources/unity_builtin_extra
-.ipynb_checkpoints/Seg_images-checkpoint.ipynb
-.ipynb_checkpoints/Segmentationpathplanning-checkpoint.ipynb
-COCO_Image_Viewer.ipynb
-deeplabv3_xception65_ade20k.h5
-mask_rcnn_model2.h5
-Pathoutput.png
-posedetection.py
-Seg_images.ipynb
-seg_images1.zip
-seglabels.txt
-segmentationcam.py
-Segmentationpathplanning.ipynb
-testval.json
-vis.py
-trainval.json
-.ipynb_checkpoints/
-weights/
-yolov5/
-yolov5_weights/
-AquaVision_RetinaNET.ipynb
-labels.txt
-model.py
-saved_model.h5
-testing.py
-wincap.py
