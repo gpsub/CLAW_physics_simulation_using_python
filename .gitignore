@@ -28,6 +28,8 @@ share/
 
 # Package files
 *.jar
+weights/variables/
+
 
 # Maven
 target/
