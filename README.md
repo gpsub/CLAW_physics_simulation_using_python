@@ -50,6 +50,7 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     - Left/right arrow key -> second right arm up/down
     - U H J K -> Move entire robot. U: Move forward J: Move back H: Rotate left K: Rotate right
     - R -> Reset  
+    - Q/Escape -> Quit
 
     The blue circle represents a ball which is floating in the water, you can interact with it by moving the robot arms/body.
 - **To run reinforcement learning code**:  
