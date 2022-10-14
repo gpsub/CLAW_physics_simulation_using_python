@@ -48,7 +48,9 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     - **A,D** key-> second left arm up/down  
     - **Up/Down** arrow key -> Rightmost arm up/down
     - **Left/right** arrow key -> second right arm up/down
-    - **U,H,J,K** -> Move entire robot. U: Move forward J: Move back H: Rotate left K: Rotate right
+    - **U,H,J,K** -> Move entire robot. U: Move forward J: Move back H: Rotate left K: Rotate right.
+    
+        **Pro tip**: Press U/ J quickly 5-6 times to make it go really fast  
     - **R** -> Reset  
     - **Q/Escape** -> Quit
 
