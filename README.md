@@ -2,6 +2,7 @@
 
 - This is a python GUI that simulates the movement of the CLAW robot in water(sea), taking into account drift, inertia, mass, rotational inertia, friction, impulse, collisions, and many other physical parameters.
 - A reinforcement learning model has also been trained such that the robot can adjust the angles between its arms to reach the target value
+- This GUI was made during my PS1 internship @ Sentient labs as a testing environment for automated movement, before deploying on the real product
 <br>
 <img src="example.jpg" style="width:250px"><br>
 
@@ -62,5 +63,3 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     It will begin the training process of the model, it will settle to the target "angles between arms" (array of 4 values) which has been already set in the program after a few minutes.  
 
     The model is learning to incrementally rotate its arms so that it can reach the target "angles between arms"  which has been set by the user. Once the model is trained, the robot will be able to rotate its arms to reach any angle passed by the user.  
-
-    This GUI was made during my PS1 internship as a testing environment for automated movement, before deploying on the real product.
