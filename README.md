@@ -44,13 +44,13 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     `python physics_env_main.py`  
 
     **Controls**: 
-    - W S key-> leftmost arm up/down
-    - A D key-> second left arm up/down  
-    - Up/ Down arrow key -> Rightmost arm up/down
-    - Left/right arrow key -> second right arm up/down
-    - U H J K -> Move entire robot. U: Move forward J: Move back H: Rotate left K: Rotate right
-    - R -> Reset  
-    - Q/Escape -> Quit
+    - **W,S** key-> leftmost arm up/down
+    - **A,D** key-> second left arm up/down  
+    - **Up/Down** arrow key -> Rightmost arm up/down
+    - **Left/right** arrow key -> second right arm up/down
+    - **U,H,J,K** -> Move entire robot. U: Move forward J: Move back H: Rotate left K: Rotate right
+    - **R** -> Reset  
+    - **Q/Escape** -> Quit
 
     The blue circle represents a ball which is floating in the water, you can interact with it by moving the robot arms/body.
 - **To run reinforcement learning code**:  
@@ -61,4 +61,4 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
 
     The model is learning to incrementally rotate its arms so that it can reach the target "angles between arms"  which has been set by the user. Once the model is trained, the robot will be able to rotate its arms to reach any angle passed by the user.  
 
-    This GUI was created as a testing environment for automated movement, before deploying on the real product.
+    This GUI was made during my PS1 internship as a testing environment for automated movement, before deploying on the real product.
