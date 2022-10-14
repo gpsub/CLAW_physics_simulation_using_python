@@ -3,7 +3,7 @@
 - This is a python GUI that simulates the movement of the CLAW robot in water(sea), taking into account drift, inertia, mass, rotational inertia, friction, impulse, collisions, and many other physical parameters.
 - A reinforcement learning model has also been trained such that the robot can adjust the angles between its arms to reach the target value
 <br>
-<img src="example.jpg" style="width:300px"><br>
+<img src="example.jpg" style="width:250px"><br>
 
 ## Packages used
 -  **Pygame** 
@@ -19,9 +19,12 @@
 ## Installation
 Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already installed Python>=3.5 on your system
 - **Make a new virtual environment**    
-    `python -m venv CLAW_sim`    
-    `cd CLAW_sim`
-    `Scripts\activate`
+    `python -m venv CLAW_sim`  
+
+    `cd CLAW_sim`  
+
+    `Scripts\activate`  
+    
     `python -m pip install -–upgrade pip`
 - **Clone repository**
     `git clone https://github.com/gpsub/CLAW_physics_simulation_using_python.git`
