@@ -32,7 +32,7 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     `git clone https://github.com/gpsub/CLAW_physics_simulation_using_python.git`
 - **Install packages**  
 
-    `pip install -y tensorflow pymunk pygame`
+    `pip install tensorflow pymunk pygame`
 
 ## How to run
 - **Go to folder**  
