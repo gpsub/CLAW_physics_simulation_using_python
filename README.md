@@ -24,11 +24,13 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     `cd CLAW_sim`  
 
     `Scripts\activate`  
-    
+
     `python -m pip install -–upgrade pip`
-- **Clone repository**
+- **Clone repository**  
+
     `git clone https://github.com/gpsub/CLAW_physics_simulation_using_python.git`
-- **Install packages**
+- **Install packages**  
+
     `pip install -y tensorflow pymunk pygame`
 
 ## How to run
@@ -50,7 +52,8 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     - R -> Reset  
 
     The blue circle represents a ball which is floating in the water, you can interact with it by moving the robot arms/body.
-- **To run reinforcement learning code**: 
+- **To run reinforcement learning code**:  
+ 
     `python rl_first_version\env2.py`  
 
     It will begin the training process of the model, it will settle to the target "angles between arms" (array of 4 values) which has been already set in the program after a few minutes.  
