@@ -58,7 +58,7 @@ Open the terminal(Mac/Linux)/Command prompt(Windows), make sure you have already
     The blue circle represents a ball which is floating in the water, you can interact with it by moving the robot arms/body.
 - **To run reinforcement learning code**:  
 
-    `python rl_first_version\env2.py`  
+    `python rl_first_version\main.py`  
 
     It will begin the training process of the model, it will settle to the target "angles between arms" (array of 4 values) which has been already set in the program after a few minutes.  
 

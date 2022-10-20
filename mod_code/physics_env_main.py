@@ -133,7 +133,7 @@ class Simulator(object):
         self.space.add(self.leftLeg_1a_body, self.leftLeg_1a_shape, self.rightLeg_1a_body, self.rightLeg_1a_shape) 
         self.space.add(self.leftLeg_1b_body, self.leftLeg_1b_shape, self.rightLeg_1b_body, self.rightLeg_1b_shape) 
         self.space.add(self.pj_ba1left, self.motor_ba1Left, self.pj_ac1left, self.motor_ac1Left)  
-        self.space.add(self.pj_ba1Right, self.motor_ba1Right, self.pj_ac1Right, self.motor_ac1Right)      
+        self.space.add(self.pj_ba1Right, self.motor_ba1Right, self.pj_ac1Right, self.motor_ac1Right)
         self.space.add(self.object_1,self.shape_box) ## Uncomment to add moving ball---prevent collisions with ShapeFilter
         self.leftLeg_1a_shape.filter = pymunk.ShapeFilter(group=1)
         self.rightLeg_1a_shape.filter = pymunk.ShapeFilter(group=2)
