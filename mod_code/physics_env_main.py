@@ -7,6 +7,8 @@ import pymunk
 from pymunk import Vec2d    
 import pymunk.pygame_util
 from pynput.keyboard import Key,Controller
+from physics_params import set_env_physics
+from newBody import create_body
 keyboard = Controller()
 delta = 1
 rotationRate = 1
@@ -16,56 +18,17 @@ class Simulator(object):
 
     def __init__(self):
         ### NOTE:Initialising the space with all the motors, joints, bodies etc.
-        self.space = pymunk.Space()
-        self.space.gravity = (0.0, 0.0)
-        #self.space.damping = 0.999 # to prevent it from blowing up
+        chassisXY,chWd,chHt,chassisMass,legWd_a,legHt_a,legWd_b,legHt_b,legMass,relativeAnguVel = set_env_physics(self)
 
-        self.display_flags = 0
-        self.display_size = (600, 600)
-        # Pymunk physics coordinates start from the lower right-hand corner of the screen
-        self.ground_y = 600
-        ground = pymunk.Segment(self.space.static_body, (0, 605), (605,605), 1.0)
-        ground.friction = 0.2
-        left = pymunk.Segment(self.space.static_body, (-5, 0), (-5, 600), 1)
-        left.friction = 0.2
-        right = pymunk.Segment(self.space.static_body, (603,0), (603,600), 1.0)
-        right.friction = 0.2
-        top = pymunk.Segment(self.space.static_body, (0,-5), (600,-5), 1.0)
-        top.friction = 0.2
-        ground.elasticity = 1.0
-        left.elasticity = 1.0
-        top.elasticity = 1.0
-        right.elasticity = 1.0        
-        self.space.add(ground,left,right,top)
-        self.reward = 0
-        pygame.init()
-        self.screen = pygame.display.set_mode(self.display_size)
-        pygame.display.set_caption("CLAW_Arm")
-        width, height = self.screen.get_size()
-       ## bg_img = pygame.image.load('mod_code\water_bg.png').convert()
-        #self.screen.blit(bg_img,[0,0])
-        self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
-        # self.draw_options.flags = pymunk.SpaceDebugDrawOptions.DRAW_SHAPES | pymunk.SpaceDebugDrawOptions.DRAW_COLLISION_POINTS
-        # Delete above line to show the purple colour joints, I chose to remove it to make opencv detection more simple
-        self.clock = pygame.time.Clock()
-        font = pygame.font.Font(None, 16)
-        # Set the initial coordinates and the weights/inertias for all the bodies
-        chassisXY = Vec2d(self.display_size[0]/2,300)
-        chWd = 120; chHt = 5
-        chassisMass = 40
-        self.reward=0
-        legWd_a = 100; legHt_a = 5
-        legWd_b = 100; legHt_b = 5 
-        legMass = 5
-        relativeAnguVel = 0
        ### DEFINITION of  arms of the claw
-       ## Trash object definition(the blue circle which is the target)
+       ## Blue circle object definition
         self.object_1 =pymunk.Body(2,pymunk.moment_for_circle(5,0,10))
         self.object_1.friction = 2
         self.object_1.position = Vec2d(210, 210)
         self.shape_box  = pymunk.Circle(self.object_1,10)
         self.shape_box.color = (0,0,128,0)            
-        # Middle shoulder join definition                   #pymunk.Body.STATIC
+
+        # Middle shoulder joint definition                   #pymunk.Body.STATIC
         self.chassis_b = pymunk.Body(chassisMass, pymunk.moment_for_box(chassisMass, (chWd, chHt)))
         self.chassis_b.position = chassisXY
         chassis_shape = pymunk.Poly.create_box(self.chassis_b, (chWd, chHt))
@@ -73,35 +36,30 @@ class Simulator(object):
         self.chassis_b.start_position = chassisXY
         self.chassis_b.start_angle = 0
         print("chassis position");print(self.chassis_b.position)
+
+
         #-- Definition of left rarearm (adjacent connected  to the middle arm)
-        self.leftLeg_1a_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_a, legHt_a)))
-        self.leftLeg_1a_body.position = chassisXY - ((chWd/2)+(legWd_a/2), 0)
-        self.leftLeg_1a_body.start_position = self.chassis_b.start_position - ((chWd/2)+(legWd_a/2), 0)
-        self.leftLeg_1a_body.start_angle = 0 
+        self.leftLeg_1a_body = create_body(legMass, legWd_a,legHt_a,chassisXY,chWd,0,self.chassis_b,"left")
+
         self.leftLeg_1a_shape = pymunk.Poly.create_box(self.leftLeg_1a_body, (legWd_a, legHt_a))        
         self.leftLeg_1a_shape.color = (255, 0, 0,0)
 
         #---Definition of the left forearm(adjacent connected to the left rarearm)
-        self.leftLeg_1b_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_b, legHt_b)))
-        self.leftLeg_1b_body.position = self.leftLeg_1a_body.position - ((legWd_a/2)+(legWd_b/2), 0)
-        self.leftLeg_1b_body.start_position = self.leftLeg_1a_body.start_position - ((legWd_a/2)+(legWd_b/2), 0)
-        self.leftLeg_1b_body.start_angle = 0 
+        self.leftLeg_1b_body = create_body(legMass, legWd_b,legHt_b,self.leftLeg_1a_body.position,legWd_a,0,self.leftLeg_1a_body,"left")
+
         self.leftLeg_1b_shape = pymunk.Poly.create_box(self.leftLeg_1b_body, (legWd_b, legHt_b))        
         self.leftLeg_1b_shape.color = (0, 255, 0,0)        
 
         #---Definition of the right rarearm(adjacent connected to the right of the middle shoulder body)
-        self.rightLeg_1a_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_a, legHt_a)))
-        self.rightLeg_1a_body.position = chassisXY + ((chWd/2)+(legWd_a/2), 0)
-        self.rightLeg_1a_body.start_position = self.chassis_b.start_position + ((chWd/2)+(legWd_a/2), 0)
-        self.rightLeg_1a_body.start_angle = 0
+        
+        self.rightLeg_1a_body = create_body(legMass, legWd_a,legHt_a,chassisXY,chWd,0,self.chassis_b,"right")
+
         self.rightLeg_1a_shape = pymunk.Poly.create_box(self.rightLeg_1a_body, (legWd_a, legHt_a))        
         self.rightLeg_1a_shape.color = (255, 0, 0,0)        
 
         #---Definition of the right forearm (adjacent connected to the right of the right rarearm)
-        self.rightLeg_1b_body = pymunk.Body(legMass, pymunk.moment_for_box(legMass, (legWd_b, legHt_b)))
-        self.rightLeg_1b_body.position = self.rightLeg_1a_body.position + ((legWd_a/2)+(legWd_b/2), 0)
-        self.rightLeg_1b_body.start_position = self.rightLeg_1a_body.start_position + ((legWd_a/2)+(legWd_b/2), 0)
-        self.rightLeg_1b_body.start_angle = 0
+        self.rightLeg_1b_body = create_body(legMass, legWd_b,legHt_b,self.rightLeg_1a_body.position,legWd_a,0,self.rightLeg_1a_body,"right")
+
         self.rightLeg_1b_shape = pymunk.Poly.create_box(self.rightLeg_1b_body, (legWd_b, legHt_b))        
         self.rightLeg_1b_shape.color = (0, 255, 0,0)     
         
@@ -156,7 +114,7 @@ class Simulator(object):
         self.handler.separate = self.coll_separate
        
        ## variables to control the movement of the claw 
-        self.target = [100,180,180,100]
+        self.target = [100,180,180,100] # to set the target angle for self.change_angle()
         self.passed = self.target ## initially same, then passed decreases to 0
         ## passed value should be decreasing, target should be constant, passed value should be target value minus current value
         self.simulate = True
@@ -181,7 +139,7 @@ class Simulator(object):
                     self.space.step(dt)
         # self.return_angle_state()
         self.check_collide()
-        # self.change_angle(self.passed)
+        # self.change_angle(self.passed)  
         self.getjointpositions()
         pygame.display.flip()
         self.clock.tick(fps)
