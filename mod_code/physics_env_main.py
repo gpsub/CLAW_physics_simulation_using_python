@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import USEREVENT, QUIT, KEYDOWN, KEYUP,K_e,K_s, K_r, K_q,K_w,K_a,K_s,K_d,K_k,K_u,K_j,K_h,K_j,K_z,K_ESCAPE, K_UP, K_DOWN, K_RIGHT, K_LEFT,K_2,K_4,K_6,K_8
 import numpy as np
 import pymunk
-from pymunk import Vec2d    
+from pymunk import Vec2d
 import pymunk.pygame_util
 from physics_params import set_env_physics
 from newBody import create_body
@@ -59,7 +59,7 @@ class Simulator(object):
         #---Definition of the right forearm (adjacent connected to the right of the right rarearm)
         self.rightLeg_1b_body = create_body(legMass, legWd_b,legHt_b,self.rightLeg_1a_body.position,legWd_a,0,self.rightLeg_1a_body,"right")
 
-        self.rightLeg_1b_shape = pymunk.Poly.create_box(self.rightLeg_1b_body, (legWd_b, legHt_b))        
+        self.rightLeg_1b_shape = pymunk.Poly.create_box(self.rightLeg_1b_body, (legWd_b, legHt_b))
         self.rightLeg_1b_shape.color = (0, 255, 0,0)     
         
         self.object_1.start_position = Vec2d(210,210)
@@ -132,7 +132,7 @@ class Simulator(object):
         pygame.display.flip()
         fps = 50
         iterations = 25
-        dt = 1.0/float(fps)/float(iterations)
+        dt = (1.0/float(fps))/float(iterations)
         if self.simulate:
                 for x in range(iterations): # 10 iterations to get a more stable simulation
                     self.space.step(dt)
@@ -146,11 +146,12 @@ class Simulator(object):
     def return_angle_state(self):
         ## this function is basically to note what angle values are currently there in the claw arms
         ## it doesnt have any utility, just for development purposes
-            self.chassis_angle = self.chassis_b.angle*180/np.pi
-            self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
-            self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
-            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-self.chassis_angle-360))
-            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle-self.chassis_angle+360)
+            convert = 180/np.pi
+            self.chassis_angle = self.chassis_b.angle*convert
+            self.lr_angle = abs(round(self.leftLeg_1a_body.angle*convert-self.chassis_angle-180))
+            self.rr_angle  = round(self.rightLeg_1a_body.angle*convert-self.chassis_angle+180)
+            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*convert+self.lr_angle-self.chassis_angle-360))
+            self.rf_angle = round(self.rightLeg_1b_body.angle*convert-self.rr_angle-self.chassis_angle+360)
             print(str(self.lf_angle)+" "+str(self.lr_angle)+" "+str(self.rr_angle)+" "+str(self.rf_angle))
         ## state consists of angles, forward velocity of claw, angular velocity of claw, position of target object, caught object or not, net reward
         ## now gives constant angle
@@ -214,11 +215,12 @@ class Simulator(object):
     def change_angle(self,angles):
             ## this function is used to set the motor rate so that it can move to the desired target angle, (whether by increasing)
             # or decreasing
-            self.chassis_angle = self.chassis_b.angle*180/np.pi
-            self.lr_angle = abs(round(self.leftLeg_1a_body.angle*180/np.pi-self.chassis_angle-180))
-            self.rr_angle  = round(self.rightLeg_1a_body.angle*180/np.pi-self.chassis_angle+180)
-            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*180/np.pi+self.lr_angle-self.chassis_angle-360))
-            self.rf_angle = round(self.rightLeg_1b_body.angle*180/np.pi-self.rr_angle-self.chassis_angle+360)
+            convert = 180/np.pi
+            self.chassis_angle = self.chassis_b.angle*convert # Converting since pygame angles are given in radians
+            self.lr_angle = abs(round(self.leftLeg_1a_body.angle*convert-self.chassis_angle-180))
+            self.rr_angle  = round(self.rightLeg_1a_body.angle*convert-self.chassis_angle+180)
+            self.lf_angle = abs(round(self.leftLeg_1b_body.angle*convert+self.lr_angle-self.chassis_angle-360))
+            self.rf_angle = round(self.rightLeg_1b_body.angle*convert-self.rr_angle-self.chassis_angle+360)
             cur_angles = [self.lf_angle,self.lr_angle,self.rr_angle,self.rf_angle]
             target_angles = self.target
             if (abs(target_angles[0]-cur_angles[0])<delta) and (abs(target_angles[1]-cur_angles[1])<delta) and (abs(target_angles[2]-cur_angles[2])<delta) and (abs(target_angles[3]-cur_angles[3])<delta):
