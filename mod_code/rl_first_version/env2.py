@@ -28,6 +28,7 @@ class ClawArms(object):
         self.goal = {'x': 180., 'y': 290.,'l':30. }
         self.state_dim = 5# we have 5d array for state
         self.action_dim = 4 # we have 4 d array for angle (actions)
+        
     def step(self,action):
         ###Changing the angle
         done = False

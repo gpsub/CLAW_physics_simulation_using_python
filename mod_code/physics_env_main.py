@@ -6,10 +6,9 @@ import numpy as np
 import pymunk
 from pymunk import Vec2d    
 import pymunk.pygame_util
-from pynput.keyboard import Key,Controller
 from physics_params import set_env_physics
 from newBody import create_body
-keyboard = Controller()
+
 delta = 1
 rotationRate = 1
 

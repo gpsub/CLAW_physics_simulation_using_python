@@ -1,9 +1,3 @@
-"""
-Plug a RL method to the framework, this method can be discrete or continuous.
-This script is based on a continuous action RL. If you want to change to discrete RL like DQN,
-please change the env.py and rl.py correspondingly.
-"""
-
 ## Please install tensorflow, pyglet, pymunk library using pip before running this file
  
 from env2 import ClawArms
