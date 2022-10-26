@@ -5,7 +5,7 @@ from rl import DDPG
 
 MAX_EPISODES = 200
 MAX_EP_STEPS = 200
-ON_TRAIN = True
+ON_TRAIN = False
 
 # getting variables from env2.py
 env = ClawArms()
